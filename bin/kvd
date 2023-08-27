@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const cli = require('../modules/cli');
+
+const [_node, _script, operation, ...argv] = process.argv;
+if (operation == null) {
+    throw new Error('Missing operation');
+}
+const handler = cli[operation];
+if (handler == null) {
+    throw new Error('Invalid operation ' + operation);
+}
+handler(...argv);
