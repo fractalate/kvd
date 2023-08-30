@@ -17,9 +17,8 @@ function autoinit(handler) {
 }
 
 async function mkvalue(...argv) {
-    console.log(argv);
     if (argv.length > 0) {
-        throw new Error('Too many arguments.');
+        die('mkvalue: too many arguments');
     }
     const valueKey = await kvd.newValue();
     console.log('OK ' + valueKey);
@@ -27,10 +26,10 @@ async function mkvalue(...argv) {
 
 async function mkread(valueKey, ...argv) {
     if (valueKey == null) {
-        throw new Error('Missing value key.');
+        die('mkread: missing value key');
     }
     if (argv.length > 0) {
-        throw new Error('Too many arguments.');
+        die('mkread: too many arguments');
     }
     const readKey = await kvd.newRead(valueKey);
     console.log('OK ' + readKey);
@@ -38,17 +37,23 @@ async function mkread(valueKey, ...argv) {
 
 async function mkwrite(valueKey, ...argv) {
     if (valueKey == null) {
-        throw new Error('Missing value key.');
+        die('mkwrite: missing value key');
     }
     if (argv.length > 0) {
-        throw new Error('Too many arguments.');
+        die('mkwrite: too many arguments');
     }
     const writeKey = await kvd.newWrite(valueKey);
     console.log('OK ' + writeKey);
+}
+
+function die(message) {
+    console.error(message);
+    process.exit(1);
 }
 
 module.exports = {
     mkvalue: autoinit(mkvalue),
     mkread: autoinit(mkread),
     mkwrite: autoinit(mkwrite),
+    die,
 };

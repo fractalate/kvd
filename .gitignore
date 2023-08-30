@@ -1,3 +1,4 @@
 # Local data directory used during development.
 /data/
 /node_modules/
+/test-run-*/

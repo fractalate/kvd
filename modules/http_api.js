@@ -1,5 +1,6 @@
 'use strict';
 
+const fsop = require('../lib/fsop');
 const { KVD } = require('../lib/kvd');
 
 function readBody(req) {
@@ -34,8 +35,14 @@ function setup(app, kvdDir) {
     });
 
     app.use((err, _req, res, _next) => {
-        console.error(err);
-        res.status(500).send();
+        if (err instanceof fsop.InvalidKeyError) {
+            res.status(400).send();
+        } else if (err instanceof fsop.ValueNotFoundError) {
+            res.status(404).send();
+        } else {
+            console.error(err);
+            res.status(500).send();
+        }
     });
 }
 
