@@ -28,32 +28,51 @@ export KVD_HTTP_PORT=$( randport )
 
 mkdir "${KVD_DIR}"
 
+echo "Creating new value..."
 VALUE_KEY=$( mkvalue )
+echo "Value key ${VALUE_KEY}"
+echo "Creating new read key..."
 READ_KEY=$( mkread "${VALUE_KEY}" )
+echo "Read key ${READ_KEY}"
+echo "Creating new write key..."
 WRITE_KEY=$( mkwrite "${VALUE_KEY}" )
+echo "Write key ${WRITE_KEY}"
 
+echo "Starting API..."
 node ../index.js &
 SERVER_PID=$!
 sleep 1
+echo "Done."
 
 INPUT="Hello, KVD!"
+echo "Performing API POST on write key..."
 curl --silent -X POST "http://localhost:${KVD_HTTP_PORT}/write/${WRITE_KEY}" --data "${INPUT}"
-OUTPUT=$( curl --silent "http://localhost:${KVD_HTTP_PORT}/read/${READ_KEY}" )
+echo "Performing API GET on write key..."
+OUTPUT_W=$( curl --silent "http://localhost:${KVD_HTTP_PORT}/write/${WRITE_KEY}" )
+echo "Performing API GET on read key..."
+OUTPUT_R=$( curl --silent "http://localhost:${KVD_HTTP_PORT}/read/${READ_KEY}" )
 
 # These erroneous requests should produce no output here or on the server.
 curl http://localhost:${KVD_HTTP_PORT}/read/..%2Fvalue
 curl -X POST http://localhost:${KVD_HTTP_PORT}/write/..%2Fvalue
 
 EXIT_CODE=0
-if [ "${INPUT}" == "${OUTPUT}" ]; then
+if [ "${INPUT}" == "${OUTPUT_W}" -a "${INPUT}" == "${OUTPUT_R}" ]; then
     echo "OK"
 else
+    echo "TEST FAILED!"
+    echo
+    echo "Directory Structure:"
     find data # Show resulting file structure.
+    echo
+    echo -n "Data Contents: "
     find data/read -type l -exec cat "{}/data" \;
+    echo
     echo
 
     echo "Expected: $INPUT" 1>&2
-    echo "Received: $OUTPUT" 1>&2
+    echo "Retrieved via Write URL: $OUTPUT_W" 1>&2
+    echo "Retrieved via Read URL: $OUTPUT_R" 1>&2
     EXIT_CODE=1
 fi
 

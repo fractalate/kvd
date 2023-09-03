@@ -15,15 +15,17 @@ function readBody(req) {
 function setup(app, kvdDir) {
     const kvd = new KVD(kvdDir);
 
-    app.get('/read/:readKey', async (req, res, next) => {
+    // Endpoints intended for reading values.
+    app.get(['/read/:key', '/write/:key'], async (req, res, next) => {
         try {
-            const data = await kvd.read(req.params.readKey);
+            const data = await kvd.read(req.params.key);
             res.send(data);
         } catch (err) {
             next(err);
         }
     });
 
+    // Endpoints intended for writing values.
     app.post('/write/:writeKey', async (req, res, next) => {
         try {
             const body = await readBody(req);
@@ -32,6 +34,10 @@ function setup(app, kvdDir) {
         } catch (err) {
             next(err);
         }
+    });
+
+    app.use((_req, res, _next) => {
+        res.status(404).send();
     });
 
     app.use((err, _req, res, _next) => {
