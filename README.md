@@ -13,6 +13,7 @@ To grant read access to your data to an application you trust, you only need to 
 * KVD uses the following environment variables as configuration:
   - Set `KVD_DIR` should point to the directory to hold KVD data. This should exist before starting the service. Default `./data/` which is useful for development.
   - Set `KVD_HTTP_PORT` should be the HTTP port that the service will listen for requests on. Default `8364`.
+  - Set `KVD_HTTP_HOST` should be the listening bind address (e.g. `0.0.0.0`) that the service will listen for requests on. Default `127.0.0.1`.
 * Install dependencies: `npm install`.
 * Run the API server: `npm run start`.
 
